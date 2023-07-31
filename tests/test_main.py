@@ -3,7 +3,7 @@ from typing import List
 import httpx
 
 # Define the base URL of the unknown server (Replace with the actual server URL)
-base_url = "http://localhost:8000"
+base_url = "http://host.docker.internal:8000"
 
 
 async def read_menu(menu_id):
@@ -34,6 +34,7 @@ async def get_all_menus():
         else:
             assert isinstance(data, List)
 
+
 async def create_menu():
     async with httpx.AsyncClient() as client:
         menu_data = {"title": "Menu 1", "description": "Description 1"}
@@ -63,7 +64,6 @@ async def update_menu(menu_id):
             assert data["description"] == menu_data["description"]
 
 
-
 async def delete_menu(menu_id):
     async with httpx.AsyncClient() as client:
         if menu_id == 999:
@@ -82,7 +82,6 @@ async def delete_menu(menu_id):
             assert data["message"] == "Menu deleted successfully."
 
 
-
 async def read_submenu(menu_id, submenu_id):
     if submenu_id == 999:
         # No pages available, assert 404 status code for menu not found
@@ -95,7 +94,8 @@ async def read_submenu(menu_id, submenu_id):
             assert data["detail"] == "submenu not found"
     else:
         async with httpx.AsyncClient() as client:
-            response = await client.get(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/", follow_redirects=True)
+            response = await client.get(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/",
+                                        follow_redirects=True)
             assert response.status_code == 200
             data = response.json()
             assert data["title"] == "Sub Menu"
@@ -146,7 +146,8 @@ async def update_submenu(menu_id, submenu_id):
             assert data["detail"] == 'Submenu not found.'
         else:
             submenu_data = {"title": "Sub Menu", "description": "Description"}
-            response = await client.patch(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/", json=submenu_data,
+            response = await client.patch(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/",
+                                          json=submenu_data,
                                           follow_redirects=True)
             assert response.status_code == 200
             data = response.json()
@@ -165,7 +166,8 @@ async def delete_submenu(menu_id, submenu_id):
             assert "detail" in data
             assert data["detail"] == 'Submenu not found.'
         else:
-            response = await client.delete(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/", follow_redirects=True)
+            response = await client.delete(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/",
+                                           follow_redirects=True)
             assert response.status_code == 200
             data = response.json()
             assert "message" in data
@@ -184,7 +186,8 @@ async def read_dish(menu_id, submenu_id, dish_id):
             assert data["detail"] == "dish not found"
     else:
         async with httpx.AsyncClient() as client:
-            response = await client.get(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}", follow_redirects=True)
+            response = await client.get(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+                                        follow_redirects=True)
             assert response.status_code == 200
             data = response.json()
             assert data["title"] == "Di sh"
@@ -194,7 +197,8 @@ async def read_dish(menu_id, submenu_id, dish_id):
 
 async def get_all_dishes(menu_id, submenu_id):
     async with httpx.AsyncClient() as client:
-        response = await client.get(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes", follow_redirects=True)
+        response = await client.get(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
+                                    follow_redirects=True)
         assert response.status_code == 200
         data = response.json()
         if len(data) == 0:
@@ -216,7 +220,8 @@ async def create_dish(menu_id, submenu_id):
     else:
         async with httpx.AsyncClient() as client:
             dish_data = {"title": "Di sh", "description": "Description", "price": "12.50"}
-            response = await client.post(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes", json=dish_data,
+            response = await client.post(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes",
+                                         json=dish_data,
                                          follow_redirects=True)
             assert response.status_code == 201
             data = response.json()
@@ -236,7 +241,8 @@ async def update_dish(menu_id, submenu_id, dish_id):
             assert data["detail"] == 'dish not found'
         else:
             dish_data = {"title": "New Di sh", "description": "New Description", "price": "24.50"}
-            response = await client.patch(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}", json=dish_data,
+            response = await client.patch(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+                                          json=dish_data,
                                           follow_redirects=True)
             assert response.status_code == 200
             data = response.json()
@@ -256,7 +262,8 @@ async def delete_dish(menu_id, submenu_id, dish_id):
             assert "detail" in data
             assert data["detail"] == 'dish not found'
         else:
-            response = await client.delete(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}", follow_redirects=True)
+            response = await client.delete(base_url + f"/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+                                           follow_redirects=True)
             assert response.status_code == 200
             data = response.json()
             assert "message" in data
@@ -271,6 +278,7 @@ async def test_unit_menus_for_404():
     await delete_menu(menu_id)
     await get_all_menus()
     await read_menu(menu_id)
+
 
 @pytest.mark.asyncio
 async def test_unit_menus_for_200():
