@@ -44,6 +44,7 @@ services:
       context: ./tests
       dockerfile: dockerfile.txt
     command: pytest
+    container_name: ylab_test
     depends_on:
       db:
         condition: service_healthy
