@@ -1,0 +1,4 @@
+pytest
+pytest-async
+pytest-asyncio
+httpx
