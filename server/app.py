@@ -12,6 +12,10 @@ try:
     engine_link = os.environ.get("DATABASE_URL") # {username}:{password}@{host}:{port}/{database_name}
 except:
     engine_link = None
+try:
+    test_check = os.environ.get("TEST_CHECK")
+except:
+    pass
 
 if engine_link:
     engine = create_async_engine(f"postgresql+asyncpg://{engine_link}")
