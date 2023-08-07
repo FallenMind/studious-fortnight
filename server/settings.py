@@ -1,5 +1,5 @@
-username = "postgres"
-password = "mysecurepassword"
-host = "host.docker.internal"
-port = "5432"
-database_name = "postgres"
+username = 'postgres'
+password = 'mysecurepassword'
+host = 'host.docker.internal'
+port = '5432'
+database_name = 'postgres'

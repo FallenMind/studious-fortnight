@@ -1,9 +1,8 @@
-from fastapi import HTTPException
-from sqlalchemy import select, func
-from sqlalchemy.orm import joinedload, subqueryload
-from sqlalchemy.ext.asyncio import AsyncSession
-
 import tables
+from fastapi import HTTPException
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload, subqueryload
 
 
 class MenuRep:
@@ -11,7 +10,7 @@ class MenuRep:
         self.session = session
 
     async def create_menu(self, menu_data: tables.MenuSchema):
-        menu_data_dict = menu_data.model_dump(exclude={"id"})
+        menu_data_dict = menu_data.model_dump(exclude={'id'})
         menu = tables.Menu(**menu_data_dict)
         self.session.add(menu)
         await self.session.commit()
@@ -68,7 +67,7 @@ class MenuRep:
                 dishes_count=dish_count,
             )
         else:
-            raise HTTPException(status_code=404, detail="menu not found")
+            raise HTTPException(status_code=404, detail='menu not found')
 
     async def update_menu(self, menu_id: int, updated_menu: tables.MenuSchema):
         menu = await self.session.get(tables.Menu, menu_id)
@@ -95,16 +94,16 @@ class MenuRep:
                 dishes_count=dish_count,
             )
         else:
-            raise HTTPException(status_code=404, detail="menu not found")
+            raise HTTPException(status_code=404, detail='menu not found')
 
     async def delete_menu(self, menu_id):
         menu = await self.session.get(tables.Menu, menu_id)
         if menu:
             await self.session.delete(menu)
             await self.session.commit()
-            return {"message": "Menu deleted successfully."}
+            return {'message': 'Menu deleted successfully.'}
         else:
-            raise HTTPException(status_code=404, detail="menu not found")
+            raise HTTPException(status_code=404, detail='menu not found')
 
 
 class SubmenuRep:
@@ -114,9 +113,9 @@ class SubmenuRep:
     async def create_submenu(self, submenu: tables.SubmenuSchema, menu_id: int):
         menu = await self.session.get(tables.Menu, menu_id)
         if not menu:
-            raise HTTPException(status_code=404, detail="Menu not found.")
-        submenu_dict = submenu.model_dump(exclude={"id"})
-        submenu_dict["menu_id"] = menu_id
+            raise HTTPException(status_code=404, detail='Menu not found.')
+        submenu_dict = submenu.model_dump(exclude={'id'})
+        submenu_dict['menu_id'] = menu_id
         submenu_data = tables.Submenu(**submenu_dict)
         self.session.add(submenu_data)
         await self.session.commit()
@@ -164,7 +163,7 @@ class SubmenuRep:
             )
             return submenu_data
         else:
-            raise HTTPException(status_code=404, detail="submenu not found")
+            raise HTTPException(status_code=404, detail='submenu not found')
 
     async def update_menu(self, menu_id: int, updated_menu: tables.MenuSchema):
         menu = await self.session.get(tables.Menu, menu_id)
@@ -186,7 +185,7 @@ class SubmenuRep:
         result = await self.session.execute(query)
         submenu = result.scalars().one_or_none()
         if not submenu:
-            raise HTTPException(status_code=404, detail="Submenu not found.")
+            raise HTTPException(status_code=404, detail='Submenu not found.')
 
         submenu.title = updated_submenu.title
         submenu.description = updated_submenu.description
@@ -206,9 +205,9 @@ class SubmenuRep:
         if submenu:
             await self.session.delete(submenu)
             await self.session.commit()
-            return {"message": "Submenu deleted successfully."}
+            return {'message': 'Submenu deleted successfully.'}
         else:
-            raise HTTPException(status_code=404, detail="Submenu not found.")
+            raise HTTPException(status_code=404, detail='Submenu not found.')
 
 
 class DishRep:
@@ -217,7 +216,7 @@ class DishRep:
 
     async def create_dish(self, dish_data: tables.DishSchema, submenu_id: int):
         dish_data_dict = dish_data.model_dump()
-        dish_data_dict["submenu_id"] = submenu_id
+        dish_data_dict['submenu_id'] = submenu_id
         dish = tables.Dish(**dish_data_dict)
         self.session.add(dish)
         await self.session.commit()
@@ -255,7 +254,7 @@ class DishRep:
                 price=str(dish.price)
             )
         else:
-            raise HTTPException(status_code=404, detail="dish not found")
+            raise HTTPException(status_code=404, detail='dish not found')
 
     async def update_dish(self, dish_id: int, updated_dish: tables.DishSchema):
         dish = await self.session.get(tables.Dish, dish_id)
@@ -271,13 +270,13 @@ class DishRep:
                 price=str(dish.price)
             )
         else:
-            raise HTTPException(status_code=404, detail="dish not found")
+            raise HTTPException(status_code=404, detail='dish not found')
 
     async def delete_dish(self, dish_id):
         dish = await self.session.get(tables.Dish, dish_id)
         if dish:
             await self.session.delete(dish)
             await self.session.commit()
-            return {"message": "Dish deleted successfully."}
+            return {'message': 'Dish deleted successfully.'}
         else:
-            raise HTTPException(status_code=404, detail="dish not found")
+            raise HTTPException(status_code=404, detail='dish not found')

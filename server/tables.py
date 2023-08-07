@@ -2,8 +2,8 @@ from typing import ForwardRef
 
 from pydantic import BaseModel, Field
 from pydantic.types import Decimal
-from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy import Column, ForeignKey, Integer, Numeric, String
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
@@ -50,8 +50,8 @@ class Dish(Base):
 
 
 class SubmenuSchema(BaseModel):
-    title: str = Field(..., title="Title of the submenu")
-    description: str = Field(..., title="Description of the submenu")
+    title: str = Field(..., title='Title of the submenu')
+    description: str = Field(..., title='Description of the submenu')
 
     class Config:
         orm_mode = True
@@ -59,9 +59,9 @@ class SubmenuSchema(BaseModel):
 
 
 class DishSchema(BaseModel):
-    title: str = Field(..., title="Title of the dish")
-    description: str = Field(..., title="Description of the dish")
-    price: str = Field(..., title="Price of the dish")
+    title: str = Field(..., title='Title of the dish')
+    description: str = Field(..., title='Description of the dish')
+    price: str = Field(..., title='Price of the dish')
 
     class Config:
         orm_mode = True
@@ -69,8 +69,8 @@ class DishSchema(BaseModel):
 
 
 class MenuSchema(BaseModel):
-    title: str = Field(..., title="Title of the menu")
-    description: str = Field(..., title="Description of the menu")
+    title: str = Field(..., title='Title of the menu')
+    description: str = Field(..., title='Description of the menu')
 
     class Config:
         orm_mode = True
