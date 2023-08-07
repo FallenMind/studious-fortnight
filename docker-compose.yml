@@ -17,6 +17,20 @@ services:
       timeout: 5s
       retries: 5
 
+    cache:
+    container_name: ylab_cache
+    build:
+      context: .
+      dockerfile: Dockerfile-cache
+    restart: always
+    ports:
+      - "6380:6379"
+    healthcheck:
+        test: [ "CMD", "redis-cli ping" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
   web:
     build:
       context: ./server
@@ -33,6 +47,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_started
 
 volumes:
   postgres_data:
