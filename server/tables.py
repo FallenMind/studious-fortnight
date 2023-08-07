@@ -2,10 +2,9 @@ from typing import ForwardRef
 
 from pydantic import BaseModel, Field
 from pydantic.types import Decimal
-from sqlalchemy import Column, Integer, String, ForeignKey, Numeric, delete
+from sqlalchemy import Column, Integer, String, ForeignKey, Numeric
 from sqlalchemy.orm import relationship, declarative_base
-from sqlalchemy.ext.asyncio import AsyncSession
-from app import test_check
+
 Base = declarative_base()
 
 SubMenuRef = ForwardRef('SubmenuSchema')
@@ -16,12 +15,7 @@ async def create_tables(engine):
     global Base
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    if test_check == "YES_I_WANT_TO_DELETE_MY_DATA":
-        async with AsyncSession(engine) as session:
-            yield session
-            await session.execute(delete(Dish))
-            await session.execute(delete(Submenu))
-            await session.execute(delete(Menu))
+
 
 class Menu(Base):
     __tablename__ = 'menu'

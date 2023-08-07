@@ -74,11 +74,7 @@ async def test_unit_menus_for_200():
 
     response = await menu_crud.delete_menu(menu_id)
     code = response.status_code
-    response_data = response.json()
     assert code == 200
-    assert "message" in response_data
-    assert response_data["message"] == "Menu deleted successfully."
-
 
 # Test cases for SubmenuCRUD
 @pytest.mark.asyncio

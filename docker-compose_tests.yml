@@ -17,6 +17,20 @@ services:
       timeout: 5s
       retries: 5
 
+  cache:
+    container_name: ylab_cache
+    build:
+      context: .
+      dockerfile: Dockerfile-cache
+    restart: always
+    ports:
+      - "6380:6379"
+    healthcheck:
+        test: [ "CMD", "redis-cli ping" ]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+  
   web:
     build:
       context: ./server
@@ -39,6 +53,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      cache:
+        condition: service_healthy
 
   pytest:
     build:
@@ -46,12 +62,7 @@ services:
       dockerfile: dockerfile.txt
     command: pytest
     container_name: ylab_test
-    volumes:
-      - .:/app          # Mount the current directory into the container for tests
-      - pytest_postgres_data:/var/lib/postgresql/data/   # Use the unique volume for pytest
     depends_on:
-      db:
-        condition: service_healthy
       web:
         condition: service_healthy
 
