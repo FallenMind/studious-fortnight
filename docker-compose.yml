@@ -3,6 +3,10 @@ version: '3.8'
 services:
   db:
     container_name: ylab_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mysecurepassword
+      - POSTGRES_DB=postgres
     build:
       context: .
       dockerfile: Dockerfile-db
@@ -17,7 +21,7 @@ services:
       timeout: 5s
       retries: 5
 
-    cache:
+  cache:
     container_name: ylab_cache
     build:
       context: .
@@ -39,7 +43,7 @@ services:
     command: python server/start.py
     environment:
       - PYTHONPATH=/app
-      - DATABASE_URL=postgres:mysecurepassword@db/postgres
+      - DATABASE_URL=postgres:mysecurepassword@db:5433/postgres
     volumes:
       - .:/app
     ports:

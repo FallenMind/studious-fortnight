@@ -3,7 +3,8 @@ class CacheRep:
         self.redis = redis_loop
 
     async def set(self, key, value, expire=3600):
-        await self.redis.set(key, value, expire=expire)
+        await self.redis.set(key, value)
+        await self.redis.expire(key, expire)
 
     async def get(self, key):
         return await self.redis.get(key)
