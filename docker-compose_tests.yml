@@ -48,7 +48,7 @@ services:
     ports:
       - "8000:8000"
     healthcheck:
-      test: ["CMD-SHELL", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "curl", "-f", "http://web:8000/health"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -63,11 +63,11 @@ services:
     build:
       context: ./tests
       dockerfile: dockerfile.txt
-    command: sh -c "sleep 10 && pytest"
+    command: sh -c "sleep 10 && python my_script.py"
     container_name: ylab_test
     depends_on:
       web:
-        condition: service_started
+        condition: service_healthy
 
 volumes:
   pytest_postgres_data:
