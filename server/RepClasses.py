@@ -4,8 +4,6 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, subqueryload
 
-# todo: typehints?
-
 
 class MenuRep:
     def __init__(self, session: AsyncSession):
@@ -49,7 +47,7 @@ class MenuRep:
 
         return menus_data
 
-    async def get_menu(self, menu_id):
+    async def get_menu(self, menu_id: int):
         menu = await self.session.get(tables.Menu, menu_id)
         if menu:
             query_submenus_count = select(func.count(tables.Submenu.id)).where(tables.Submenu.menu_id == menu_id)
@@ -98,7 +96,7 @@ class MenuRep:
         else:
             raise HTTPException(status_code=404, detail='menu not found')
 
-    async def delete_menu(self, menu_id):
+    async def delete_menu(self, menu_id: int):
         menu = await self.session.get(tables.Menu, menu_id)
         if menu:
             await self.session.delete(menu)
@@ -202,7 +200,7 @@ class SubmenuRep:
             dishes_count=dish_count
         )
 
-    async def delete_submenu(self, submenu_id):
+    async def delete_submenu(self, submenu_id: int):
         submenu = await self.session.get(tables.Submenu, submenu_id)
         if submenu:
             await self.session.delete(submenu)
@@ -230,7 +228,7 @@ class DishRep:
             price=str(dish.price)
         )
 
-    async def get_all_dishes(self, submenu_id):
+    async def get_all_dishes(self, submenu_id: int):
         query = select(tables.Dish).where(
             tables.Dish.submenu_id == submenu_id
         )
@@ -246,7 +244,7 @@ class DishRep:
             dishes.append(dish_data)
         return dishes
 
-    async def get_dish(self, dish_id):
+    async def get_dish(self, dish_id: int):
         dish = await self.session.get(tables.Dish, dish_id)
         if dish:
             return tables.DishAll(
@@ -274,7 +272,7 @@ class DishRep:
         else:
             raise HTTPException(status_code=404, detail='dish not found')
 
-    async def delete_dish(self, dish_id):
+    async def delete_dish(self, dish_id: int):
         dish = await self.session.get(tables.Dish, dish_id)
         if dish:
             await self.session.delete(dish)

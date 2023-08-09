@@ -1,6 +1,7 @@
 import os
 
 import CRUDClasses
+import redis
 import tables
 from fastapi import Depends, FastAPI
 from redis import asyncio as asyncredis
@@ -16,10 +17,7 @@ if engine_link:
 else:
     engine = create_async_engine(f'postgresql+asyncpg://{username}:{password}@{host}:{port}/{database_name}')
 app = FastAPI()
-redis_con = None
-
-
-# todo: typehints
+redis_con: redis.Redis
 
 
 async def get_session():
