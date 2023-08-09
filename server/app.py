@@ -1,10 +1,9 @@
 import os
 
 import CRUDClasses
-import redis
 import tables
 from fastapi import Depends, FastAPI
-from redis import asyncio as asyncredis
+from redis import asyncio as redis
 from settings import database_name, host, password, port, username
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -141,13 +140,13 @@ async def startup_event():
     await tables.create_tables(engine, test_check)
     if engine_link:
         try:
-            redis_con = await asyncredis.Redis(host='cache', port=6379)
+            redis_con = await redis.Redis(host='cache', port=6379)
             if not await redis_con.ping():
                 raise Exception('Failed to connect to Redis cache')
         except Exception as e:
             raise Exception('Failed to initialize Redis connection') from e
     else:
-        redis_con = await asyncredis.Redis(host='localhost', port=6380)
+        redis_con = await redis.Redis(host='localhost', port=6380)
 
 
 @app.on_event('shutdown')

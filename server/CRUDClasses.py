@@ -1,7 +1,7 @@
 import json
 
-import redis
 import tables
+from redis import asyncio as redis
 from rediska import CacheRep
 from RepClasses import DishRep, MenuRep, SubmenuRep
 from sqlalchemy.ext.asyncio import AsyncSession
