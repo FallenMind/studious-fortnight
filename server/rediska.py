@@ -14,3 +14,11 @@ class CacheRep:
 
     async def exists(self, key):
         return await self.redis.exists(key)
+
+    async def flush_db(self):
+        await self.redis.flushdb()
+
+    async def delete_by_pattern(self, pattern: str):
+        keys = await self.redis.keys(pattern)
+        if keys:
+            await self.redis.delete(*keys)

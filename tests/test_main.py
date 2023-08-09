@@ -5,6 +5,8 @@ from CRUD import DishCRUD, MenuCRUD, SubmenuCRUD
 base_url = 'http://host.docker.internal:8000'
 
 
+# todo: full reformat of file
+
 # Run the tests
 @pytest.mark.asyncio
 async def test_unit_menus_for_404():
@@ -75,6 +77,7 @@ async def test_unit_menus_for_200():
     response = await menu_crud.delete_menu(menu_id)
     code = response.status_code
     assert code == 200
+
 
 # Test cases for SubmenuCRUD
 

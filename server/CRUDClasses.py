@@ -1,7 +1,12 @@
+import json
+
+import tables
 from rediska import CacheRep
 from RepClasses import DishRep, MenuRep, SubmenuRep
-import json
-import tables
+
+# todo: typehints?
+
+
 class MenuCRUD:
     def __init__(self, rep_session, cache_loop):
         self.menu_rep = MenuRep(rep_session)
@@ -41,8 +46,12 @@ class MenuCRUD:
 
     async def delete_menu(self, menu_id):
         deleted_menu = await self.menu_rep.delete_menu(menu_id)
+        await self.cache_rep.delete('all_menus')
         await self.cache_rep.delete(f'menu_{menu_id}')
-        await self.cache_rep.delete('all_menus')  # Clear all menus cache
+        await self.cache_rep.delete_by_pattern('dish_*')
+        await self.cache_rep.delete_by_pattern('submenu_*')
+        await self.cache_rep.delete(f'menu_submenus_{menu_id}')
+        await self.cache_rep.delete_by_pattern('submenu_dishes_*')
         return deleted_menu
 
 
@@ -54,7 +63,9 @@ class SubmenuCRUD:
     async def create_submenu(self, menu_id, data):
         submenu = await self.submenu_rep.create_submenu(menu_id, data)
         await self.cache_rep.set(f'submenu_{submenu.id}', submenu.json())  # Add .json() here
-        await self.cache_rep.delete(f'menu_submenus_{menu_id}')  # Clear menu submenus cache
+        await self.cache_rep.delete(f'menu_submenus_{menu_id}')
+        await self.cache_rep.delete(f'menu_{menu_id}')
+        await self.cache_rep.delete('all_menus')
         return submenu
 
     async def get_submenu(self, submenu_id):
@@ -63,8 +74,6 @@ class SubmenuCRUD:
             return tables.SubmenuAll(**json.loads(cached_submenu))
 
         submenu = await self.submenu_rep.get_submenu(submenu_id)
-        if not submenu:
-            return None
 
         await self.cache_rep.set(f'submenu_{submenu_id}', submenu.json())  # Add .json() here
         return submenu
@@ -80,20 +89,20 @@ class SubmenuCRUD:
 
         return submenus
 
-    async def update_submenu(self, submenu_id, data):
+    async def update_submenu(self, menu_id, submenu_id, data):
         updated_submenu = await self.submenu_rep.update_submenu(submenu_id, data)
         await self.cache_rep.set(f'submenu_{submenu_id}', updated_submenu.json())  # Add .json() here
-        await self.cache_rep.delete(f'menu_submenus_{updated_submenu.menu_id}')  # Clear menu submenus cache
+        await self.cache_rep.delete(f'menu_submenus_{menu_id}')
         return updated_submenu
 
-    async def delete_submenu(self, submenu_id):
-        submenu = await self.get_submenu(submenu_id)
-        if not submenu:
-            return None
-
-        await self.submenu_rep.delete_submenu(submenu_id)
+    async def delete_submenu(self, menu_id, submenu_id):
+        submenu = await self.submenu_rep.delete_submenu(submenu_id)
         await self.cache_rep.delete(f'submenu_{submenu_id}')
-        await self.cache_rep.delete(f'menu_submenus_{submenu.menu_id}')  # Clear menu submenus cache
+        await self.cache_rep.delete(f'menu_submenus_{menu_id}')
+        await self.cache_rep.delete(f'menu_{menu_id}')
+        await self.cache_rep.delete('all_menus')
+        await self.cache_rep.delete_by_pattern('dish_*')
+        await self.cache_rep.delete(f'submenu_dishes_{submenu_id}')
         return submenu
 
 
@@ -102,10 +111,12 @@ class DishCRUD:
         self.dish_rep = DishRep(rep_session)
         self.cache_rep = CacheRep(cache_loop)
 
-    async def create_dish(self, submenu_id, data):
+    async def create_dish(self, menu_id, submenu_id, data):
         dish = await self.dish_rep.create_dish(submenu_id, data)
         await self.cache_rep.set(f'dish_{dish.id}', dish.json())  # Add .json() here
         await self.cache_rep.delete(f'submenu_dishes_{submenu_id}')  # Clear submenu dishes cache
+        await self.cache_rep.delete(f'menu_{menu_id}')
+        await self.cache_rep.delete(f'submenu_{submenu_id}')
         return dish
 
     async def get_dish(self, dish_id):
@@ -131,18 +142,19 @@ class DishCRUD:
 
         return dishes
 
-    async def update_dish(self, dish_id, data):
+    async def update_dish(self, submenu_id, dish_id, data):
         updated_dish = await self.dish_rep.update_dish(dish_id, data)
         await self.cache_rep.set(f'dish_{dish_id}', updated_dish.json())  # Add .json() here
-        await self.cache_rep.delete(f'submenu_dishes_{updated_dish.submenu_id}')  # Clear submenu dishes cache
+        await self.cache_rep.delete(f'submenu_dishes_{submenu_id}')
         return updated_dish
 
-    async def delete_dish(self, dish_id):
-        dish = await self.get_dish(dish_id)
-        if not dish:
-            return None
+    async def delete_dish(self, menu_id, submenu_id, dish_id):
+        dish = await self.dish_rep.delete_dish(dish_id)
 
-        await self.dish_rep.delete_dish(dish_id)
         await self.cache_rep.delete(f'dish_{dish_id}')
-        await self.cache_rep.delete(f'submenu_dishes_{dish.submenu_id}')  # Clear submenu dishes cache
+        await self.cache_rep.delete(f'submenu_dishes_{submenu_id}')
+        await self.cache_rep.delete(f'menu_{menu_id}')
+        await self.cache_rep.delete(f'submenu_{submenu_id}')
+        await self.cache_rep.delete(f'menu_submenus_{menu_id}')
+        await self.cache_rep.delete('all_menus')
         return dish

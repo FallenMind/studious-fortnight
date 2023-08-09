@@ -3,3 +3,5 @@ uvicorn
 sqlalchemy
 asyncpg
 pydantic
+redis
+types-redis

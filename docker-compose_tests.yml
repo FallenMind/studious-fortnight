@@ -16,6 +16,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 4s
 
   cache:
     container_name: ylab_cache
@@ -26,10 +27,11 @@ services:
     ports:
       - "6380:6379"
     healthcheck:
-        test: [ "CMD", "redis-cli ping" ]
+        test: ["CMD", "redis-cli", "ping"]
         interval: 10s
         timeout: 5s
         retries: 5
+        start_period: 4s
 
   web:
     build:
@@ -46,25 +48,26 @@ services:
     ports:
       - "8000:8000"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 5s
       retries: 3
+      start_period: 5s
     depends_on:
       db:
         condition: service_healthy
       cache:
-        condition: service_started
+        condition: service_healthy
 
   pytest:
     build:
       context: ./tests
       dockerfile: dockerfile.txt
-    command: pytest
+    command: sh -c "sleep 10 && pytest"
     container_name: ylab_test
     depends_on:
       web:
-        condition: service_healthy
+        condition: service_started
 
 volumes:
   pytest_postgres_data:

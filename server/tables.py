@@ -44,15 +44,16 @@ class Dish(Base):
     submenu = relationship('Submenu', back_populates='dishes')
 
 
-async def create_tables(engine,test_check):
+async def create_tables(engine, test_check):
     global Base
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    if test_check == "YES_I_WANT_TO_DELETE_MY_DATA":
+    if test_check == 'YES_I_WANT_TO_DELETE_MY_DATA':
         async with AsyncSession(engine) as session:
             await session.execute(delete(Dish))
             await session.execute(delete(Submenu))
             await session.execute(delete(Menu))
+            await session.commit()
 
 
 class SubmenuSchema(BaseModel):
