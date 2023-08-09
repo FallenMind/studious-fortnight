@@ -4,9 +4,12 @@ from pydantic import BaseModel, Field
 from pydantic.types import Decimal
 from sqlalchemy import Column, ForeignKey, Integer, Numeric, String, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    pass
+
 
 SubMenuRef = ForwardRef('SubmenuSchema')
 DishRef = ForwardRef('DishSchema')
