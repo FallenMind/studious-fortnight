@@ -61,7 +61,7 @@ services:
     build:
       context: ./tests
       dockerfile: dockerfile.txt
-    command: sh -c "sleep 10 && python my_script.py"
+    command: sh -c "sleep 10 && pytest"
     container_name: ylab_test
     depends_on:
       web:
